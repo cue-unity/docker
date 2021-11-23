@@ -46,6 +46,14 @@ test: _#bashWorkflow & {
 			"runs-on": "${{ matrix.os }}"
 			steps: [
 				_#checkoutCode,
+				{
+					name: "Set up qemu"
+					uses: "docker/setup-qemu-action@v1"
+				},
+				{
+					name: "Set up Docker Buildx"
+					uses: "docker/setup-buildx-action@v1"
+				},
 				_#installGo,
 				_#goGenerate,
 				{
