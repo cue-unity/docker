@@ -15,10 +15,12 @@ export DOCKER_BUILDKIT=1
 # The -p flag attempts to push the local image to Docker hub.
 
 push=""
+force=""
 
-while getopts 'p' opt; do
+while getopts 'pf' opt; do
 	case $opt in
 		p) push=true ;;
+		f) force=true ;;
 		*) echo 'Error in command line parsing' >&2
 			exit 1
 	esac
@@ -35,18 +37,22 @@ then
 	imageExists=true
 fi
 
-if ! [[ $imageExists ]]
+if [[ $force ]] || ! [[ $imageExists ]]
 then
-	if docker pull $target > /dev/null 2>&1
+	if ! [[ $force  ]] && docker pull $target > /dev/null 2>&1
 	then
 		echo "successfully pulled $target"
 		# No need to push because we pulled
 		exit 0
 	fi
-	docker build --rm -t $target .
+	pushFlag=""
+	if [[ $push ]]
+	then
+		echo "Push is $push"
+		pushFlag="--push"
+	fi
+	# linux/arm64 and linux/amd64 are sufficient here
+	# because on macOS we have native emulation.
+	docker buildx build --platform linux/arm64,linux/amd64 $pushFlag -t $target .
 fi
 
-if [[ $push ]]
-then
-	docker push $target
-fi
