@@ -1,4 +1,4 @@
-module github.com/cue-sh/unity-docker
+module github.com/cue-lang/unity-docker
 
 go 1.17
 
