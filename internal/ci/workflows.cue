@@ -58,7 +58,7 @@ test: _#bashWorkflow & {
 				_#goGenerate,
 				{
 					name: "Build image"
-					run:  "./_scripts/buildDockerImage.sh"
+					run:  "./_scripts/buildDockerImage.sh -b"
 					if:   "${{ \(_#isMain) }}"
 				},
 				_#checkGitClean,
@@ -69,7 +69,7 @@ test: _#bashWorkflow & {
 				},
 				{
 					name: "Push image to docker"
-					run:  "./_scripts/buildDockerImage.sh -p"
+					run:  "./_scripts/buildDockerImage.sh"
 					if:   "${{ \(_#isMain) }}"
 				},
 			]
@@ -155,11 +155,6 @@ _#goGenerate: _#step & {
 	// The Go version corresponds to the precise version specified in
 	// the matrix. Skip windows for now until we work out why re-gen is flaky
 	if: "matrix.go-version == '\(_#codeGenGo)' && matrix.os != '\(_#windowsMachine)'"
-}
-
-_#buildDockerImage: _#step & {
-	name: "Build docker image (locally) for unity"
-	run:  "_scripts/buildDockerImage.sh"
 }
 
 _#staticcheck: _#step & {
